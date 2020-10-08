@@ -4,8 +4,13 @@
 """
 
 import time
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
 import MySQLdb
-from PySQLPool import PySQLPool
+from .PySQLPool import PySQLPool
 import os.path
 
 logging_path = None
@@ -97,7 +102,7 @@ class PySQLQuery(object):
 				fp.write("=== Args ===\n")
 				fp.write(str(args)+"\n")
 				fp.close()
-			except Exception, e:
+			except Exception as e:
 				pass
 		
 		try:
@@ -124,9 +129,9 @@ class PySQLQuery(object):
 						fp.write("=== Row Count ===\n")
 						fp.write(str(self.rowcount)+"\n")
 						fp.close()
-					except Exception, e:
+					except Exception as e:
 						pass
-			except Exception, e:
+			except Exception as e:
 				self.lastError = e
 				self.affectedRows = None
 				if logging_path is not None:
@@ -136,7 +141,7 @@ class PySQLQuery(object):
 						fp.write("=== Error ===\n")
 						fp.write(str(e.message)+"\n")
 						fp.close()
-					except Exception, e:
+					except Exception as e:
 						pass
 		finally:
 			if cursor is not None:
@@ -185,7 +190,7 @@ class PySQLQuery(object):
 						yield row
 						
 				self.rowcount = cursor.rowcount
-			except Exception, e:
+			except Exception as e:
 				self.lastError = e
 				self.affectedRows = None
 		finally:
@@ -222,7 +227,7 @@ class PySQLQuery(object):
 				cursor = self.conn.connection.cursor(MySQLdb.cursors.DictCursor)
 				self.affectedRows = cursor.executemany(query, args)
 				self.conn.updateCheckTime()
-			except Exception, e:
+			except Exception as e:
 				self.lastError = e
 		finally:
 			if cursor is not None:
@@ -259,7 +264,7 @@ class PySQLQuery(object):
 					else:
 						self.affectedRows += cursor.execute(query)
 				self.conn.updateCheckTime()
-			except Exception, e:
+			except Exception as e:
 				self.lastError = e
 		finally:
 			if cursor is not None:
