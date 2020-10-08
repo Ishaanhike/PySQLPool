@@ -4,7 +4,7 @@
 @version: 0.2
 """
 from threading import Condition
-from connection import ConnectionManager
+from .connection import ConnectionManager
 
 class Pool(object):
 	"""
@@ -33,10 +33,10 @@ class Pool(object):
 		self.__dict__ = self.__Pool
 		
 		#For 1st instantiation lets setup all our variables
-		if not self.__dict__.has_key('lock'):
+		if 'lock' not in self.__dict__:
 			self.lock = Condition()
 			
-		if not self.__dict__.has_key('connections'):
+		if 'connections' not in self.__dict__:
 			self.connections = {}
 		
 	def Terminate(self):
@@ -52,7 +52,7 @@ class Pool(object):
 		
 		self.lock.acquire()
 		try:
-			for bucket in self.connections.values():
+			for bucket in list(self.connections.values()):
 				try:
 					for conn in bucket:
 						conn.lock()
@@ -79,7 +79,7 @@ class Pool(object):
 		"""
 		self.lock.acquire()
 		try:
-			for bucket in self.connections.values():
+			for bucket in list(self.connections.values()):
 				try:
 					for conn in bucket:
 						conn.lock()
@@ -108,7 +108,7 @@ class Pool(object):
 		"""
 		self.lock.acquire()
 		try:
-			for bucket in self.connections.values():
+			for bucket in list(self.connections.values()):
 				try:
 					for conn in bucket:
 						conn.lock()
@@ -138,7 +138,7 @@ class Pool(object):
 		
 		connection = None
 		
-		if self.connections.has_key(key):
+		if key in self.connections:
 			connection = self._getConnectionFromPoolSet(key)
 			
 			if connection is None:
@@ -158,7 +158,7 @@ class Pool(object):
 		else:
 			self.lock.acquire()
 			#We do a double check now that its locked to be sure some other thread didn't create this while we may have been waiting.
-			if not self.connections.has_key(key):
+			if key not in self.connections:
 				self.connections[key] = []
 			
 			if len(self.connections[key]) < self.maxActiveConnections:

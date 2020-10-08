@@ -4,9 +4,14 @@
 """
 
 import time
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
 import MySQLdb
-from pool import Pool
-import log
+from .pool import Pool
+from . import log
 
 class PySQLQuery(object):
 	"""
@@ -101,7 +106,7 @@ class PySQLQuery(object):
 				
 				self.record = cursor.fetchall()
 				self.conn.updateCheckTime()
-			except Exception, e:
+			except Exception as e:
 				self.lastError = e
 				self.affectedRows = None
 		finally:
@@ -145,7 +150,7 @@ class PySQLQuery(object):
 						yield row
 						
 				self.rowcount = cursor.rowcount
-			except Exception, e:
+			except Exception as e:
 				self.lastError = e
 				self.affectedRows = None
 		finally:
@@ -182,7 +187,7 @@ class PySQLQuery(object):
 				cursor = self.conn.getCursor()
 				self.affectedRows = cursor.executemany(query, args)
 				self.conn.updateCheckTime()
-			except Exception, e:
+			except Exception as e:
 				self.lastError = e
 		finally:
 			if cursor is not None:
@@ -219,7 +224,7 @@ class PySQLQuery(object):
 					else:
 						self.affectedRows += cursor.execute(query)
 				self.conn.updateCheckTime()
-			except Exception, e:
+			except Exception as e:
 				self.lastError = e
 		finally:
 			if cursor is not None:

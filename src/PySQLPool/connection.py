@@ -2,13 +2,18 @@
 @author: Nick Verbeck
 @since: 5/12/2008
 """
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass
 import MySQLdb
 import datetime
 from threading import Semaphore
 
 try:
 	from hashlib import md5 
-except Exception, e:
+except Exception as e:
 	from md5 import md5
 
 class Connection(object):
@@ -36,47 +41,47 @@ class Connection(object):
 					 'db': '',
 					 'port': 3306
 					 }
-		if kargs.has_key('host'):
+		if 'host' in kargs:
 			self.info['host'] = kargs['host']
-		if kargs.has_key('user'):
+		if 'user' in kargs:
 			self.info['user'] = kargs['user']
-		if kargs.has_key('passwd'):
+		if 'passwd' in kargs:
 			self.info['passwd'] = kargs['passwd']
-		if kargs.has_key('db'):
+		if 'db' in kargs:
 			self.info['db'] = kargs['db']
-		if kargs.has_key('port'):
+		if 'port' in kargs:
 			self.info['port'] = int(kargs['port'])
-		if kargs.has_key('connect_timeout'):
+		if 'connect_timeout' in kargs:
 			self.info['connect_timeout'] = kargs['connect_timeout']
-		if kargs.has_key('use_unicode'):
+		if 'use_unicode' in kargs:
 			self.info['use_unicode'] = kargs['use_unicode']
-		if kargs.has_key('charset'):
+		if 'charset' in kargs:
 			self.info['charset'] = kargs['charset']
-		if kargs.has_key('local_infile'):
+		if 'local_infile' in kargs:
 			self.info['local_infile'] = kargs['local_infile']
 			
 		#Support Legacy Username
-		if kargs.has_key('username'):
+		if 'username' in kargs:
 			self.info['user'] = kargs['username']
 		#Support Legacy Password
-		if kargs.has_key('password'):
+		if 'password' in kargs:
 			self.info['passwd'] = kargs['password']
 		#Support Legacy Schema
-		if kargs.has_key('schema'):
+		if 'schema' in kargs:
 			self.info['db'] = kargs['schema']
 			
-		if kargs.has_key('commitOnEnd'):
+		if 'commitOnEnd' in kargs:
 			self.commitOnEnd = kargs['commitOnEnd']
 		else:
 			self.commitOnEnd = False
 			
-		hashStr = ''.join([str(x) for x in self.info.values()])
+		hashStr = ''.join([str(x) for x in list(self.info.values())])
 		self.key = md5(hashStr).hexdigest()
 		
 	def __getattr__(self, name):
 		try:
 			return self.info[name]
-		except Exception, e:
+		except Exception as e:
 			return None
 		
 	def getKey(self):
@@ -197,7 +202,7 @@ class ConnectionManager(object):
 				cursor.execute('select current_user')
 				self._updateCheckTime()
 				return True
-			except Exception, e:
+			except Exception as e:
 				self.connection.close()
 				self.connection = None
 				return False
@@ -217,7 +222,7 @@ class ConnectionManager(object):
 				c = self.getCursor()
 				c.execute('BEGIN;')
 				c.close()
-		except Exception, e:
+		except Exception as e:
 			pass
 				
 			
@@ -236,7 +241,7 @@ class ConnectionManager(object):
 				self.connection.commit()
 				self._updateCheckTime()
 				self.release()
-		except Exception, e:
+		except Exception as e:
 			pass
 	Commit = commit
 			
@@ -255,7 +260,7 @@ class ConnectionManager(object):
 				self.connection.rollback()
 				self._updateCheckTime()
 				self.release()
-		except Exception, e:
+		except Exception as e:
 			pass
 	
 	def Close(self):
@@ -270,5 +275,5 @@ class ConnectionManager(object):
 				self.connection.commit()
 				self.connection.close()
 				self.connection = None
-			except Exception, e:
+			except Exception as e:
 				pass

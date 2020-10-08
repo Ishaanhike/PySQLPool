@@ -7,9 +7,9 @@ logger = None
 log_level = logging.INFO
 
 #We rename these for legacy support. Will phase out with 1.0 most likely
-import connection
-import query
-import pool
+from . import connection
+from . import query
+from . import pool
 
 #Connection short cuts
 def getNewConnection(*args, **kargs):
