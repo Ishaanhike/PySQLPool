@@ -2,6 +2,7 @@
 @author: Nick Verbeck
 @since: 5/12/2008
 """
+import sys
 try:
     import pymysql
     pymysql.install_as_MySQLdb()
@@ -76,7 +77,10 @@ class Connection(object):
 			self.commitOnEnd = False
 			
 		hashStr = ''.join([str(x) for x in list(self.info.values())])
-		self.key = md5(hashStr).hexdigest()
+		if sys.version_info[0] < 3:
+			self.key = md5(hashStr).hexdigest()
+		else:
+			self.key = md5(hashStr.encode('utf-8')).hexdigest()
 		
 	def __getattr__(self, name):
 		try:
