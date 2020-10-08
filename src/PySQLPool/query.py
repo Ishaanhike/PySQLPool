@@ -35,6 +35,7 @@ class PySQLQuery(object):
 		@since: 5/12/2008
 		"""
 		self.connInfo = PySQLConnectionObj
+		self.commitOnEnd = commitOnEnd
 		self.record = {}
 		self.rowcount = 0
 		self.affectedRows = None
